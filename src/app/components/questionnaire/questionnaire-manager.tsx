@@ -306,7 +306,7 @@ export function QuestionnaireManager() {
               (questionType === "video" && questions.video.length === 0) ||
               (questionType === "multipleChoice" && questions.multipleChoice.length === 0)) && (
               <div className="text-center py-8 text-muted-foreground">
-                No questions added yet. Click "Add Question" to create one.
+                No questions added yet. Click &quot;Add Question&quot; to create one.
               </div>
             )}
           </div>
