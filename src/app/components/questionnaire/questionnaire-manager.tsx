@@ -158,15 +158,15 @@ export function QuestionnaireManager() {
               {questionType === "general"
                 ? "General Questions"
                 : questionType === "video"
-                  ? "Video Questions"
-                  : "Multiple-Choice Questions"}
+                ? "Video Questions"
+                : "Multiple-Choice Questions"}
             </CardTitle>
             <CardDescription>
               {questionType === "general"
                 ? "Text-based questions for candidates to answer"
                 : questionType === "video"
-                  ? "Questions for video responses"
-                  : "Questions with predefined answer options"}
+                ? "Questions for video responses"
+                : "Questions with predefined answer options"}
             </CardDescription>
           </div>
 
@@ -181,9 +181,13 @@ export function QuestionnaireManager() {
               <DialogHeader>
                 <DialogTitle>Add New Question</DialogTitle>
                 <DialogDescription>
-                  Create a new{" "}
-                  {questionType === "general" ? "general" : questionType === "video" ? "video" : "multiple-choice"}{" "}
-                  question
+                  {`Create a new ${
+                    questionType === "general"
+                      ? "general"
+                      : questionType === "video"
+                      ? "video"
+                      : "multiple-choice"
+                  } question`}
                 </DialogDescription>
               </DialogHeader>
 
@@ -317,4 +321,3 @@ export function QuestionnaireManager() {
     </div>
   )
 }
-

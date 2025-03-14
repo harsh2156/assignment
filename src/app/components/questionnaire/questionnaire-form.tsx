@@ -4,15 +4,28 @@ import type React from "react"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2 } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
 
-// Sample questions
+// Define the type of an answer: either a string for text/multiple-choice answers or an array of numbers for checkbox answers.
+type Answer = string | number[];
+
 const questions = [
   {
     id: "q1",
@@ -24,7 +37,8 @@ const questions = [
   {
     id: "q2",
     type: "text",
-    question: "Explain the difference between 'let', 'const', and 'var' in JavaScript.",
+    question:
+      "Explain the difference between 'let', 'const', and 'var' in JavaScript.",
   },
   {
     id: "q3",
@@ -48,12 +62,13 @@ const questions = [
   {
     id: "q5",
     type: "text",
-    question: "Describe a challenging problem you've solved in a previous project.",
+    question:
+      "Describe a challenging problem you've solved in a previous project.",
   },
 ]
 
 export function QuestionnaireForm({ interviewId }: { interviewId: string }) {
-  const [answers, setAnswers] = useState<Record<string, any>>({})
+  const [answers, setAnswers] = useState<Record<string, Answer>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -83,9 +98,12 @@ export function QuestionnaireForm({ interviewId }: { interviewId: string }) {
   }
 
   const handleCheckboxChange = (questionId: string, index: number) => {
-    const currentSelections = answers[questionId] || []
+    // Fix: Use questionId instead of question.id
+    const currentSelections = Array.isArray(answers[questionId])
+      ? (answers[questionId] as number[])
+      : []
     const newSelections = currentSelections.includes(index)
-      ? currentSelections.filter((i: number) => i !== index)
+      ? currentSelections.filter((i) => i !== index)
       : [...currentSelections, index]
 
     setAnswers((prev) => ({ ...prev, [questionId]: newSelections }))
@@ -105,9 +123,16 @@ export function QuestionnaireForm({ interviewId }: { interviewId: string }) {
     questions.forEach((question) => {
       if (!answers[question.id]) {
         newErrors[question.id] = "This question requires an answer"
-      } else if (question.type === "text" && answers[question.id].trim() === "") {
+      } else if (
+        question.type === "text" &&
+        (answers[question.id] as string).trim() === ""
+      ) {
         newErrors[question.id] = "Please provide a response"
-      } else if (question.type === "checkbox" && answers[question.id].length === 0) {
+      } else if (
+        question.type === "checkbox" &&
+        Array.isArray(answers[question.id]) &&
+        answers[question.id].length === 0
+      ) {
         newErrors[question.id] = "Please select at least one option"
       }
     })
@@ -145,13 +170,16 @@ export function QuestionnaireForm({ interviewId }: { interviewId: string }) {
       <Card>
         <CardHeader>
           <CardTitle>Assessment Submitted</CardTitle>
-          <CardDescription>Thank you for completing the assessment</CardDescription>
+          <CardDescription>
+            Thank you for completing the assessment
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Alert>
             <AlertTitle>Success!</AlertTitle>
             <AlertDescription>
-              Your assessment has been submitted successfully. The interviewer will review your responses.
+              Your assessment has been submitted successfully. The interviewer
+              will review your responses.
             </AlertDescription>
           </Alert>
 
@@ -162,18 +190,26 @@ export function QuestionnaireForm({ interviewId }: { interviewId: string }) {
               <div key={question.id} className="border-b pb-4">
                 <p className="font-medium">{question.question}</p>
                 {question.type === "text" ? (
-                  <p className="mt-2 text-muted-foreground">{answers[question.id]}</p>
+                  <p className="mt-2 text-muted-foreground">
+                    {answers[question.id] as string}
+                  </p>
                 ) : question.type === "multiple-choice" ? (
                   <p className="mt-2 text-muted-foreground">
-                    {(question.options ?? [])[Number.parseInt(answers[question.id])]}
+                    {(question.options ?? [])[Number.parseInt(answers[question.id] as string)]}
                   </p>
                 ) : (
                   <div className="mt-2 space-y-1">
-                    {(answers[question.id] || []).map((index: number) => (
-                      <p key={index} className="text-muted-foreground">
-                        • {(question.options ?? [])[index]}
-                      </p>
-                    ))}
+                    {(() => {
+                      // Explicitly assign checkbox answers to a number array
+                      const checkboxAnswers: number[] = Array.isArray(answers[question.id])
+                        ? (answers[question.id] as number[])
+                        : []
+                      return checkboxAnswers.map((index: number) => (
+                        <p key={index} className="text-muted-foreground">
+                          • {(question.options ?? [])[index]}
+                        </p>
+                      ))
+                    })()}
                   </div>
                 )}
               </div>
@@ -181,7 +217,9 @@ export function QuestionnaireForm({ interviewId }: { interviewId: string }) {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={() => (window.location.href = "/dashboard")}>Return to Dashboard</Button>
+          <Button onClick={() => (window.location.href = "/dashboard")}>
+            Return to Dashboard
+          </Button>
         </CardFooter>
       </Card>
     )
@@ -191,7 +229,9 @@ export function QuestionnaireForm({ interviewId }: { interviewId: string }) {
     <Card>
       <CardHeader>
         <CardTitle>Assessment Form</CardTitle>
-        <CardDescription>Please answer all questions to complete the assessment</CardDescription>
+        <CardDescription>
+          Please answer all questions to complete the assessment
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -204,37 +244,70 @@ export function QuestionnaireForm({ interviewId }: { interviewId: string }) {
               {question.type === "text" ? (
                 <Textarea
                   id={question.id}
-                  value={answers[question.id] || ""}
+                  value={
+                    typeof answers[question.id] === "string"
+                      ? (answers[question.id] as string)
+                      : ""
+                  }
                   onChange={(e) => handleTextChange(question.id, e.target.value)}
                   className={errors[question.id] ? "border-destructive" : ""}
                   rows={4}
                 />
               ) : question.type === "multiple-choice" ? (
                 <RadioGroup
-                  value={answers[question.id]}
+                  value={
+                    typeof answers[question.id] === "string"
+                      ? (answers[question.id] as string)
+                      : ""
+                  }
                   onValueChange={(value) => handleRadioChange(question.id, value)}
-                  className={`space-y-2 ${errors[question.id] ? "border border-destructive rounded-md p-2" : ""}`}
+                  className={`space-y-2 ${
+                    errors[question.id]
+                      ? "border border-destructive rounded-md p-2"
+                      : ""
+                  }`}
                 >
                   {(question.options ?? []).map((option, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <RadioGroupItem value={index.toString()} id={`${question.id}-${index}`} />
-                      <Label htmlFor={`${question.id}-${index}`} className="text-sm sm:text-base cursor-pointer">
+                      <RadioGroupItem
+                        value={index.toString()}
+                        id={`${question.id}-${index}`}
+                      />
+                      <Label
+                        htmlFor={`${question.id}-${index}`}
+                        className="text-sm sm:text-base cursor-pointer"
+                      >
                         {option}
                       </Label>
                     </div>
                   ))}
                 </RadioGroup>
               ) : (
-                <div className={`space-y-2 ${errors[question.id] ? "border border-destructive rounded-md p-2" : ""}`}>
+                <div
+                  className={`space-y-2 ${
+                    errors[question.id]
+                      ? "border border-destructive rounded-md p-2"
+                      : ""
+                  }`}
+                >
                   {(question.options ?? []).map((option, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <Checkbox
                         id={`${question.id}-${index}`}
-                        checked={(answers[question.id] || []).includes(index)}
-                        onCheckedChange={() => handleCheckboxChange(question.id, index)}
+                        checked={
+                          Array.isArray(answers[question.id])
+                            ? (answers[question.id] as number[]).includes(index)
+                            : false
+                        }
+                        onCheckedChange={() =>
+                          handleCheckboxChange(question.id, index)
+                        }
                         className="h-4 w-4 sm:h-5 sm:w-5"
                       />
-                      <Label htmlFor={`${question.id}-${index}`} className="text-sm sm:text-base cursor-pointer">
+                      <Label
+                        htmlFor={`${question.id}-${index}`}
+                        className="text-sm sm:text-base cursor-pointer"
+                      >
                         {option}
                       </Label>
                     </div>
@@ -242,7 +315,9 @@ export function QuestionnaireForm({ interviewId }: { interviewId: string }) {
                 </div>
               )}
 
-              {errors[question.id] && <p className="text-sm text-destructive">{errors[question.id]}</p>}
+              {errors[question.id] && (
+                <p className="text-sm text-destructive">{errors[question.id]}</p>
+              )}
             </div>
           ))}
 
