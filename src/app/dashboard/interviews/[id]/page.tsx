@@ -1,12 +1,9 @@
 import { VideoInterview } from "@/app/components/interview/video-interview"
 import { JSX } from "react"
 
-interface PageProps {
-  params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
 
-export default async function InterviewPage({ params }: PageProps): Promise<JSX.Element> {
+
+export default async function InterviewPage(params:{id: string}) {
   return (
     <div className="space-y-6">
       <div>
