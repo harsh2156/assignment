@@ -1,6 +1,6 @@
 import { VideoInterview } from "@/app/components/interview/video-interview"
 
-export default function InterviewPage({ params }: { params: { id: string } }) {
+export default async function InterviewPage({ params }: { params: { id: string } }) {
   return (
     <div className="space-y-6">
       <div>
@@ -12,4 +12,3 @@ export default function InterviewPage({ params }: { params: { id: string } }) {
     </div>
   )
 }
-
