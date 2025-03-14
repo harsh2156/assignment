@@ -1,7 +1,4 @@
 import { VideoInterview } from "@/app/components/interview/video-interview"
-import { JSX } from "react"
-
-
 
 export default async function InterviewPage(params:{id: string}) {
   return (
