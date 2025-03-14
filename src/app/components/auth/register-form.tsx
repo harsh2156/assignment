@@ -77,8 +77,12 @@ export function RegisterForm() {
       setIsSubmitting(true)
       try {
         await register(formValues.name, formValues.email, formValues.password)
-      } catch (error) {
-        setRegisterError("Registration failed. Please try again.")
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setRegisterError(error.message)
+        } else {
+          setRegisterError("Registration failed. Please try again.")
+        }
       } finally {
         setIsSubmitting(false)
       }

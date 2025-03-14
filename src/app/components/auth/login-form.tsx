@@ -59,8 +59,12 @@ export function LoginForm() {
       setIsSubmitting(true)
       try {
         await login(formValues.email, formValues.password)
-      } catch (error) {
-        setLoginError("Invalid email or password. Please try again.")
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setLoginError(error.message)
+        } else {
+          setLoginError("Invalid email or password. Please try again.")
+        }
       } finally {
         setIsSubmitting(false)
       }
