@@ -1,0 +1,15 @@
+import { VideoInterview } from "@/app/components/interview/video-interview"
+
+export default function InterviewPage({ params }: { params: { id: string } }) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight">Interview Session</h2>
+        <p className="text-muted-foreground">Interview ID: {params.id}</p>
+      </div>
+
+      <VideoInterview interviewId={params.id} />
+    </div>
+  )
+}
+
